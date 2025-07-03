@@ -91,6 +91,11 @@ export default function CapybaraGame() {
           newVelocity = 0;
         }
 
+        console.log("Game loop:", {
+          capybaraY: newCapybaraY,
+          velocity: newVelocity,
+        });
+
         // Move obstacles
         const newObstacles = prev.obstacles
           .map((obs) => ({ ...obs, x: obs.x - GAME_SPEED }))
@@ -187,7 +192,7 @@ export default function CapybaraGame() {
             className="absolute transition-all duration-75 ease-out"
             style={{
               left: "100px",
-              bottom: `${GROUND_HEIGHT + gameState.capybaraY}px`,
+              bottom: `${GROUND_HEIGHT + Math.max(0, gameState.capybaraY)}px`,
               width: `${CAPYBARA_WIDTH}px`,
               height: `${CAPYBARA_HEIGHT}px`,
             }}
