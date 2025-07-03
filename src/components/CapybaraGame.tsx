@@ -38,8 +38,14 @@ export default function CapybaraGame() {
 
     setGameState((prev) => {
       // Можно прыгать только с земли
-      if (prev.capybaraY > 0) return prev;
+      if (prev.capybaraY > 0.1) return prev;
 
+      console.log(
+        "Jump! Current Y:",
+        prev.capybaraY,
+        "New velocity:",
+        JUMP_STRENGTH,
+      );
       return {
         ...prev,
         capybaraVelocity: JUMP_STRENGTH,
@@ -76,12 +82,14 @@ export default function CapybaraGame() {
 
     const gameLoop = setInterval(() => {
       setGameState((prev) => {
-        const newCapybaraY = Math.max(
-          0,
-          prev.capybaraY + prev.capybaraVelocity,
-        );
-        const newVelocity =
-          newCapybaraY <= 0 ? 0 : prev.capybaraVelocity + GRAVITY;
+        let newCapybaraY = prev.capybaraY + prev.capybaraVelocity;
+        let newVelocity = prev.capybaraVelocity + GRAVITY;
+
+        // Проверяем касание земли
+        if (newCapybaraY <= 0) {
+          newCapybaraY = 0;
+          newVelocity = 0;
+        }
 
         // Move obstacles
         const newObstacles = prev.obstacles
