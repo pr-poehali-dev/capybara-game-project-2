@@ -81,7 +81,7 @@ export default function CapybaraGame() {
           prev.capybaraY + prev.capybaraVelocity,
         );
         const newVelocity =
-          prev.capybaraY <= 0 ? 0 : prev.capybaraVelocity + GRAVITY;
+          newCapybaraY <= 0 ? 0 : prev.capybaraVelocity + GRAVITY;
 
         // Move obstacles
         const newObstacles = prev.obstacles
