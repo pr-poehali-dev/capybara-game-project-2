@@ -35,13 +35,17 @@ export default function CapybaraGame() {
 
   const jump = useCallback(() => {
     if (!gameState.isRunning || gameState.gameOver) return;
-    if (gameState.capybaraY > 0) return; // Можно прыгать только с земли
 
-    setGameState((prev) => ({
-      ...prev,
-      capybaraVelocity: JUMP_STRENGTH,
-    }));
-  }, [gameState.isRunning, gameState.gameOver, gameState.capybaraY]);
+    setGameState((prev) => {
+      // Можно прыгать только с земли
+      if (prev.capybaraY > 0) return prev;
+
+      return {
+        ...prev,
+        capybaraVelocity: JUMP_STRENGTH,
+      };
+    });
+  }, [gameState.isRunning, gameState.gameOver]);
 
   const startGame = () => {
     setGameState({
