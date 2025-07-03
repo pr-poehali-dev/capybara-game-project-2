@@ -20,12 +20,13 @@ const CAPYBARA_HEIGHT = 45;
 const OBSTACLE_WIDTH = 20;
 const OBSTACLE_HEIGHT = 60;
 const GAME_SPEED = 4;
+const SCORE_MULTIPLIER = 100;
 
 export default function CapybaraGame() {
   const [gameState, setGameState] = useState<GameState>({
     isRunning: false,
     score: 0,
-    capybaraY: GROUND_HEIGHT,
+    capybaraY: 0,
     capybaraVelocity: 0,
     obstacles: [],
     gameOver: false,
@@ -34,18 +35,19 @@ export default function CapybaraGame() {
 
   const jump = useCallback(() => {
     if (!gameState.isRunning || gameState.gameOver) return;
+    if (gameState.capybaraY > 0) return; // Можно прыгать только с земли
 
     setGameState((prev) => ({
       ...prev,
       capybaraVelocity: JUMP_STRENGTH,
     }));
-  }, [gameState.isRunning, gameState.gameOver]);
+  }, [gameState.isRunning, gameState.gameOver, gameState.capybaraY]);
 
   const startGame = () => {
     setGameState({
       isRunning: true,
       score: 0,
-      capybaraY: GROUND_HEIGHT,
+      capybaraY: 0,
       capybaraVelocity: 0,
       obstacles: [],
       gameOver: false,
@@ -57,7 +59,7 @@ export default function CapybaraGame() {
     setGameState({
       isRunning: false,
       score: 0,
-      capybaraY: GROUND_HEIGHT,
+      capybaraY: 0,
       capybaraVelocity: 0,
       obstacles: [],
       gameOver: false,
@@ -71,11 +73,11 @@ export default function CapybaraGame() {
     const gameLoop = setInterval(() => {
       setGameState((prev) => {
         const newCapybaraY = Math.max(
-          GROUND_HEIGHT,
+          0,
           prev.capybaraY + prev.capybaraVelocity,
         );
         const newVelocity =
-          prev.capybaraY <= GROUND_HEIGHT ? 0 : prev.capybaraVelocity + GRAVITY;
+          prev.capybaraY <= 0 ? 0 : prev.capybaraVelocity + GRAVITY;
 
         // Move obstacles
         const newObstacles = prev.obstacles
@@ -103,8 +105,8 @@ export default function CapybaraGame() {
 
           const obsLeft = obs.x;
           const obsRight = obs.x + obs.width;
-          const obsTop = GROUND_HEIGHT + CAPYBARA_HEIGHT - obs.height;
-          const obsBottom = GROUND_HEIGHT + CAPYBARA_HEIGHT;
+          const obsTop = 0;
+          const obsBottom = obs.height;
 
           return (
             capybaraRight > obsLeft &&
@@ -118,8 +120,8 @@ export default function CapybaraGame() {
           return { ...prev, gameOver: true };
         }
 
-        // Update score
-        const newScore = prev.score + 1;
+        // Update score (slower)
+        const newScore = Math.floor(prev.score + 0.1);
         const shouldShowCode = newScore >= 100 && !prev.showSecretCode;
 
         return {
@@ -173,7 +175,7 @@ export default function CapybaraGame() {
             className="absolute transition-all duration-75 ease-out"
             style={{
               left: "100px",
-              bottom: `${GROUND_HEIGHT - gameState.capybaraY}px`,
+              bottom: `${GROUND_HEIGHT + gameState.capybaraY}px`,
               width: `${CAPYBARA_WIDTH}px`,
               height: `${CAPYBARA_HEIGHT}px`,
             }}
@@ -187,6 +189,7 @@ export default function CapybaraGame() {
                   gameState.capybaraVelocity < 0
                     ? "brightness(1.2)"
                     : "brightness(1)",
+                transform: "scaleX(-1)",
               }}
             />
           </div>
